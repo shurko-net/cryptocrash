@@ -5,8 +5,8 @@ import type { NextPage } from "next";
 import ReactDOM from "react-dom";
 import { PlayerBets } from "~~/components/race-betting/PlayerBets";
 import { CarRace } from "~~/components/race-betting/car-race/CarRace";
+import { Side } from "~~/components/race-betting/side/Side";
 
-// import { Side } from "~~/components/race-betting/side/Side";
 // import { useGameHub } from "~~/hooks/signalr/useGameHub";
 // import { GameResult } from "~~/types/betting";
 
