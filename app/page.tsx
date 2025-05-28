@@ -1,103 +1,100 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import type { NextPage } from "next";
+import ReactDOM from "react-dom";
+
+// import { PlayerBets } from "~~/components/race-betting/PlayerBets";
+// import { CarRace } from "~~/components/race-betting/car-race/CarRace";
+// import { Side } from "~~/components/race-betting/side/Side";
+// import { useGameHub } from "~~/hooks/signalr/useGameHub";
+// import { GameResult } from "~~/types/betting";
+
+const Home: NextPage = () => {
+  const [gameStatus, setGameStatus] = useState<string>("");
+
+  const {
+    shortCarX,
+    longCarX,
+    timer,
+    gameResult,
+    isGameStarted,
+    isBettingOpen,
+    isLoading,
+    placeBet,
+    connectionError,
+    gameId,
+  } = useGameHub();
+
+  const isWinnerDisplay = !isGameStarted && !isBettingOpen;
+
+  useEffect(() => {
+    if (isWinnerDisplay) {
+      const statusMap: Record<Exclude<GameResult, null>, string> = {
+        long: "Win: Long",
+        short: "Win: Short",
+        tie: "Win: Tie",
+      };
+      setGameStatus(gameResult === null ? "Win: Unknown" : statusMap[gameResult]);
+    } else if (isGameStarted) {
+      setGameStatus("In the Round");
+    } else if (isBettingOpen) {
+      setGameStatus("Round Through");
+    } else {
+      setGameStatus("");
+    }
+  }, [isBettingOpen, timer, gameResult, isGameStarted, isWinnerDisplay]);
+
+  const getBackgroundColor = () => {
+    if (isWinnerDisplay) {
+      switch (gameResult) {
+        case "long":
+          return "bg-[radial-gradient(at_top_left,rgba(45,196,78,0.4)_0%,rgba(45,196,78,0.1)_50%,transparent_80%)]";
+        case "short":
+          return "bg-[radial-gradient(at_top_left,rgba(252,36,162,0.4)_0%,rgba(252,36,162,0.1)_50%,transparent_80%)]";
+        case "tie":
+          return "bg-[radial-gradient(at_top_left,rgba(254,203,2,0.4)_0%,rgba(254,203,2,0.1)_50%,transparent_80%)]";
+      }
+    }
+  };
+
+  if (connectionError) {
+    return ReactDOM.createPortal(
+      <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/70">
+        {connectionError.message}
+      </div>,
+      document.body,
+    );
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <>
+      <div className="container pt-[4.75rem] lg:pt-[1rem]">
+        <div className="flex flex-col md:flex-row gap-4 sm:max-md:mx-auto sm:max-md:max-w-[32rem] ">
+          <div className="grow overflow-hidden max-md:contents">
+            <div className="md:mb-4 gap-4 md:flex md:h-[24.875rem] lg:h-[26.925rem] relative -order-1">
+              <>
+                <CarRace
+                  shortCarX={shortCarX}
+                  longCarX={longCarX}
+                  isGameStarted={isGameStarted}
+                  isWinnerDisplay={isWinnerDisplay}
+                  timer={timer}
+                  isBettingOpen={isBettingOpen}
+                  getBackgroundColor={getBackgroundColor}
+                  isLoading={isLoading}
+                  gameStatus={gameStatus}
+                  gameResult={gameResult}
+                />
+              </>
+            </div>
+            <PlayerBets />
+          </div>
+          <Side placeBet={placeBet} isBettingOpen={isBettingOpen} gameId={gameId} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
-}
+};
+
+export default Home;
