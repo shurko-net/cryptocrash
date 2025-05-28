@@ -3,7 +3,7 @@ import BetSideOption from "./BetSideOption";
 import Input from "./Input";
 import toast from "react-hot-toast";
 import { formatEther, parseEther } from "viem";
-import { useScaffoldWriteContract, useWatchBalance } from "~~/hooks/scaffold-eth";
+import { useCustomWriteContract, useWatchBalance } from "~~/hooks/web3";
 import { BetSide } from "~~/types/betting";
 
 interface BetAmountProps {
@@ -18,7 +18,7 @@ export default function BetAmount({ authStatus, isBettingOpen, placeBet, address
   const [betAmount, setBetAmount] = useState<number>(0);
   const [betSide, setBetSide] = useState<BetSide>(null);
 
-  const { writeContractAsync, isMining } = useScaffoldWriteContract("MyContract");
+  const { writeContractAsync, isMining } = useCustomWriteContract("MyContract");
 
   const { data: balance } = useWatchBalance({
     address,
