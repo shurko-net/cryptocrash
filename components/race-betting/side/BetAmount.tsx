@@ -8,14 +8,14 @@ import { BetSide } from "~~/types/betting";
 
 interface BetAmountProps {
   authStatus: string;
-  address: string | undefined;
-  isBettingOpen: boolean;
-  placeBet: (amount: number, side: BetSide, txHash: string, gameId: string) => Promise<void>;
-  gameId: string;
+  address: `0x${string}` | undefined;
+  isBettingOpen: boolean | null;
+  placeBet: (amount: number, side: BetSide, txHash: string, gameId: string | null) => Promise<void>;
+  gameId: string | null;
 }
 
 export default function BetAmount({ authStatus, isBettingOpen, placeBet, address, gameId }: BetAmountProps) {
-  const [betAmount, setBetAmount] = useState<number>(0);
+  const [betAmount, setBetAmount] = useState(0);
   const [betSide, setBetSide] = useState<BetSide>(null);
 
   const { writeContractAsync, isMining } = useCustomWriteContract("MyContract");

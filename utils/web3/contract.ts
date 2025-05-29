@@ -3,7 +3,7 @@ import type { ExtractAbiFunctionNames } from "abitype";
 import { Abi, AbiParametersToPrimitiveTypes, ExtractAbiFunction } from "abitype";
 import type { MergeDeepRecord } from "type-fest/source/merge-deep";
 import { Address, TransactionReceipt, WriteContractErrorType } from "viem";
-import { Config } from "wagmi";
+import { Config, UseReadContractParameters } from "wagmi";
 import { WriteContractParameters, WriteContractReturnType } from "wagmi/actions";
 import { WriteContractVariables } from "wagmi/query";
 import deployedContractsData from "~~/contracts/deployedContracts";
@@ -14,6 +14,7 @@ export type InheritedFunctions = { readonly [key: string]: string };
 
 export type WriteAbiStateMutability = "nonpayable" | "payable";
 type AbiStateMutability = "pure" | "view" | "nonpayable" | "payable";
+export type ReadAbiStateMutability = "view" | "pure";
 
 export type GenericContract = {
   address: Address;
@@ -62,6 +63,8 @@ export type GenericContractsDeclaration = {
   };
 };
 
+export const contracts = contractsData as GenericContractsDeclaration | null;
+
 type ContractsDeclaration = IsContractDeclarationMissing<GenericContractsDeclaration, typeof contractsData>;
 
 type ConfiguredChainId = (typeof dappConfig)["targetNetworks"][0]["id"];
@@ -95,6 +98,24 @@ export type AbiFunctionInputs<TAbi extends Abi, TFunctionName extends string> = 
   TAbi,
   TFunctionName
 >["inputs"];
+
+export enum ContractCodeStatus {
+  "LOADING",
+  "DEPLOYED",
+  "NOT_FOUND",
+}
+
+export type AbiFunctionOutputs<TAbi extends Abi, TFunctionName extends string> = ExtractAbiFunction<
+  TAbi,
+  TFunctionName
+>["outputs"];
+
+export type AbiFunctionReturnType<TAbi extends Abi, TFunctionName extends string> = IsContractDeclarationMissing<
+  any,
+  AbiParametersToPrimitiveTypes<AbiFunctionOutputs<TAbi, TFunctionName>> extends readonly [any]
+    ? AbiParametersToPrimitiveTypes<AbiFunctionOutputs<TAbi, TFunctionName>>[0]
+    : AbiParametersToPrimitiveTypes<AbiFunctionOutputs<TAbi, TFunctionName>>
+>;
 
 type OptionalTuple<T> = T extends readonly [infer H, ...infer R] ? readonly [H | undefined, ...OptionalTuple<R>] : T;
 
@@ -136,6 +157,20 @@ type UseDappArgsParam<
     : {
         args?: never;
       };
+
+export type UseDappReadConfig<
+  TContractName extends ContractName,
+  TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, ReadAbiStateMutability>,
+> = {
+  contractName: TContractName;
+  watch?: boolean;
+} & IsContractDeclarationMissing<
+  Partial<UseReadContractParameters>,
+  {
+    functionName: TFunctionName;
+  } & UseDappArgsParam<TContractName, TFunctionName> &
+    Omit<UseReadContractParameters, "chainId" | "abi" | "address" | "functionName" | "args">
+>;
 
 export type DappWriteContractVariables<
   TContractName extends ContractName,

@@ -5,9 +5,9 @@ import { useGlobalState } from "~~/services/store/store";
 import { BetSide } from "~~/types/betting";
 
 interface SideProps {
-  isBettingOpen: boolean;
+  isBettingOpen: boolean | null;
   placeBet: (amount: number, side: BetSide, txHash: string) => Promise<void>;
-  gameId: string;
+  gameId: string | null;
 }
 
 export const Side = ({ isBettingOpen, placeBet, gameId }: SideProps) => {

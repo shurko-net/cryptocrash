@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useAccount } from "wagmi";
-import scaffoldConfig from "~~/scaffold.config";
+import dappConfig from "~~/dapp.config";
 import { useGlobalState } from "~~/services/store/store";
-import { ChainWithAttributes, NETWORKS_EXTRA_DATA } from "~~/utils/scaffold-eth";
+import { ChainWithAttributes, NETWORKS_EXTRA_DATA } from "~~/utils/web3";
 
 export function useTargetNetwork(): { targetNetwork: ChainWithAttributes } {
   const { chain } = useAccount();
@@ -10,7 +10,7 @@ export function useTargetNetwork(): { targetNetwork: ChainWithAttributes } {
   const setTargetNetwork = useGlobalState(({ setTargetNetwork }) => setTargetNetwork);
 
   useEffect(() => {
-    const newSelectedNetwork = scaffoldConfig.targetNetworks.find(targetNetwork => targetNetwork.id === chain?.id);
+    const newSelectedNetwork = dappConfig.targetNetworks.find(targetNetwork => targetNetwork.id === chain?.id);
     if (newSelectedNetwork && newSelectedNetwork.id !== targetNetwork.id) {
       setTargetNetwork(newSelectedNetwork);
     }

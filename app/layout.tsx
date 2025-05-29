@@ -1,3 +1,4 @@
+import { AppWithProviders } from "~~/components/AppWithProviders";
 import "~~/styles/globals.css";
 import { getMetadata } from "~~/utils/getMetadata";
 
@@ -13,7 +14,9 @@ const RootLayout = ({
 }>) => {
   return (
     <html suppressHydrationWarning>
-      <body></body>
+      <body>
+        <AppWithProviders>{children}</AppWithProviders>
+      </body>
     </html>
   );
 };

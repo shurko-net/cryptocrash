@@ -2,21 +2,21 @@ import { useState } from "react";
 import Input from "./Input";
 import toast from "react-hot-toast";
 import { formatEther, parseEther } from "viem";
-import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useCustomReadContract, useCustomWriteContract } from "~~/hooks/web3";
 import { useGlobalState } from "~~/services/store/store";
 
 export default function Withdraw({ address }: { address: string | undefined }) {
   const [betAmount, setBetAmount] = useState(0);
   const authStatus = useGlobalState(({ authStatus }) => authStatus);
 
-  const { writeContractAsync, isMining } = useScaffoldWriteContract("MyContract");
+  const { writeContractAsync, isMining } = useCustomWriteContract("MyContract");
 
   const {
     data: balance,
     isLoading,
     error,
     refetch,
-  } = useScaffoldReadContract({
+  } = useCustomReadContract({
     contractName: "MyContract",
     functionName: "balanceOf",
     args: [address],

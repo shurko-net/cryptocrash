@@ -1,7 +1,7 @@
 import { AuthenticationStatus } from "@rainbow-me/rainbowkit";
 import { create } from "zustand";
-import scaffoldConfig from "~~/scaffold.config";
-import { ChainWithAttributes } from "~~/utils/scaffold-eth";
+import dappConfig from "~~/dapp.config";
+import { ChainWithAttributes } from "~~/utils/web3";
 
 type GlobalState = {
   targetNetwork: ChainWithAttributes;
@@ -11,7 +11,7 @@ type GlobalState = {
 };
 
 export const useGlobalState = create<GlobalState>(set => ({
-  targetNetwork: scaffoldConfig.targetNetworks[0],
+  targetNetwork: dappConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
   authStatus: "loading",
   setAuthStatus: (newStatus: AuthenticationStatus) => set(() => ({ authStatus: newStatus })),

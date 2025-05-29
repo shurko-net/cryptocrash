@@ -1,3 +1,4 @@
+export * from "./useCustomReadContract";
 export * from "./useCustomWriteContract";
 export * from "./useDeployedContractInfo";
 export * from "./useNetworkColor";
